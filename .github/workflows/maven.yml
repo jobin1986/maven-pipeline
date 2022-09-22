@@ -24,5 +24,23 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn -B package --file pom.xml
+  scan:
+  
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK 8
+      uses: actions/setup-java@v3
+      with:
+        java-version: '8'
+        distribution: 'temurin'
+        cache: maven
+    - name: get IQ
+      run:  curl -L -f -o /tmp/nexus-iq-cli-latest.jar https://download.sonatype.com/clm/scanner/latest.jar
+    - name: Scan with IQ
+      run: java -jar /tmp/nexus-iq-cli-latest.jar -i maven-pipline -a admin:admin1234 -s https://jbernienexusiq.eu.ngrok.io -t build 
       
+    
+    
       
