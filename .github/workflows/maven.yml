@@ -39,7 +39,7 @@ jobs:
     - name: get IQ
       run:  curl -L -f -o /tmp/nexus-iq-cli-latest.jar https://download.sonatype.com/clm/scanner/latest.jar
     - name: Scan with IQ
-      run: java -jar /tmp/nexus-iq-cli-latest.jar -i maven-pipline -a admin:admin1234 -s https://jbernienexusiq.eu.ngrok.io -t build 
+      run: java -jar /tmp/nexus-iq-cli-latest.jar -i maven-pipline -a admin:admin1234 -s https://iq.jbernie.eu.ngrok.io -t build .
       
     
     
