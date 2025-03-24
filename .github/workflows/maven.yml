@@ -40,7 +40,7 @@ jobs:
           api-key: ${{ secrets.CLOUDSMITH_API_KEY }}
           command: "push"
           format: "maven"
-          owner: "joseph-bernie"
+          owner: "joseph-bernie-org"
           repo: "develop"
           pom-file: "pom.xml"
           file: "target/simple-java-webapp-${{ env.VERSION }}.war"
