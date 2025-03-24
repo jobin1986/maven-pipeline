@@ -27,7 +27,8 @@ jobs:
           VERSION="1.0.${{ github.run_number }}-SNAPSHOT"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "Updating pom.xml with version $VERSION"
-          sed -i "s|<version>.*</version>|<version>${VERSION}</version>|" pom.xml
+          sed -i "0,/<version>.*<\/version>/s//<version>${VERSION}<\/version>/" pom.xml
+
 
       - name: Build with Maven
         run: mvn -B package --file pom.xml
