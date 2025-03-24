@@ -1,46 +1,45 @@
 # This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
 
-name: Java CI with Maven
+name: Push Maven
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  push
 
 jobs:
-  build:
-
+  push:
+    name: Maven Build and Push to Cloudsmith
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up JDK 8
-      uses: actions/setup-java@v3
-      with:
-        java-version: '8'
-        distribution: 'temurin'
-        cache: maven
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
-  scan:
-  
-    runs-on: ubuntu-latest
+      - uses: actions/checkout@v4
 
-    steps:
-    - uses: actions/checkout@v3
-    - name: Set up JDK 8
-      uses: actions/setup-java@v3
-      with:
-        java-version: '8'
-        distribution: 'temurin'
-        cache: maven
-    - name: get IQ
-      run:  curl -L -f -o /tmp/nexus-iq-cli-latest.jar https://download.sonatype.com/clm/scanner/latest.jar
-    - name: Scan with IQ
-      run: java -jar /tmp/nexus-iq-cli-latest.jar -i maven-pipline -a admin:admin1234 -s https://iq.jbernie.eu.ngrok.io -t build .
-      
-    
-    
-      
+      - name: Set up JDK 8
+        uses: actions/setup-java@v3
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Set Dynamic Version
+        id: set-version
+        run: |
+          VERSION="1.0.${{ github.run_number }}-SNAPSHOT"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Updating pom.xml with version $VERSION"
+          sed -i "s|<version>.*</version>|<version>${VERSION}</version>|" pom.xml
+
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+
+      - name: Push to Cloudsmith
+        id: push
+        uses: cloudsmith-io/action@master
+        with:
+          api-key: ${{ secrets.CLOUDSMITH_API_KEY }}
+          command: "push"
+          format: "maven"
+          owner: "joseph-bernie-org"
+          repo: "develop"
+          pom-file: "pom.xml"
+          file: "target/simple-java-webapp-${{ env.VERSION }}.war"
